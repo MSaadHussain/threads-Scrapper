@@ -258,7 +258,7 @@ async function scrapeQuery(query) {
   }
 
   const page = await context.newPage();
-  const url = `https://www.threads.com/search?q=${encodeURIComponent(query.phrase)}&serp_type=default&filter=recent`;
+  const url = `https://www.threads.com/search?q=${encodeURIComponent(query.phrase)}&filter=recent&serp_type=default`;
 
   try {
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 60000 });
@@ -588,6 +588,23 @@ app.patch("/api/leads/:id", (request, response) => {
   lead.status = request.body.status;
   persist();
   response.json({ ok: true, lead });
+});
+
+app.delete("/api/leads", (_request, response) => {
+  const deletedCount = state.leads.length;
+  state.leads = [];
+  for (const query of state.queries) {
+    query.lastNewCount = 0;
+    query.lastQualifiedCount = 0;
+  }
+  addActivity(
+    "leads",
+    "All leads deleted",
+    `${deletedCount} collected lead${deletedCount === 1 ? "" : "s"} permanently removed. Scheduled searches are unchanged.`,
+    "neutral"
+  );
+  persist();
+  response.json({ ok: true, deletedCount });
 });
 
 app.post("/api/notifications", (request, response) => {

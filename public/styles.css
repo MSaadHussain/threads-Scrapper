@@ -389,6 +389,18 @@ svg {
   color: white;
 }
 
+.button-danger {
+  border-color: #efc8cc;
+  background: #fff5f5;
+  color: #bd454e;
+  box-shadow: none;
+}
+
+.button-danger:hover:not(:disabled) {
+  border-color: #df9fa5;
+  background: var(--red-soft);
+}
+
 .button-small {
   min-height: 35px;
   padding: 0 11px;
@@ -1313,10 +1325,15 @@ svg {
 
 .lead-toolbar {
   display: grid;
-  grid-template-columns: minmax(240px, 1fr) 170px 135px 135px auto;
+  grid-template-columns: minmax(240px, 1fr) 170px 135px 135px auto auto;
   align-items: center;
   gap: 10px;
   margin-bottom: 16px;
+}
+
+.button-delete-leads {
+  min-height: 42px;
+  white-space: nowrap;
 }
 
 .search-mini {

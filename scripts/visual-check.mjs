@@ -13,6 +13,7 @@ await page.getByRole("button", { name: /^Leads/ }).click();
 await page.waitForTimeout(350);
 console.log(`Intent badges: ${await page.locator(".intent-state").count()}`);
 console.log(`Intent filters: ${await page.locator("#lead-intent-filter option").count()}`);
+console.log(`Delete-all controls: ${await page.locator("#delete-all-leads").count()}`);
 await page.screenshot({ path: "dashboard-leads.png", fullPage: true });
 await page.getByRole("button", { name: "Deliveries" }).click();
 await page.waitForTimeout(350);

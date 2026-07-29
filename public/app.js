@@ -181,6 +181,7 @@ function renderLeads() {
     return matchesText && matchesQuery && matchesIntent && matchesStatus;
   });
   $("#lead-toolbar-count").textContent = `${filtered.length} lead${filtered.length === 1 ? "" : "s"}`;
+  $("#delete-all-leads").disabled = appState.data.leads.length === 0;
   $("#all-leads-list").innerHTML = filtered.length
     ? filtered.map(leadMarkup).join("")
     : emptyState(
@@ -457,6 +458,32 @@ async function updateLead(leadId, status) {
   }
 }
 
+async function deleteAllLeads() {
+  const visibleCount = appState.data.leads.length;
+  if (!visibleCount) {
+    toast("There are no leads to delete");
+    return;
+  }
+  const confirmed = window.confirm(
+    `Permanently delete all collected leads?\n\nThis cannot be undone. Your searches, schedules, Threads login, and delivery settings will remain active.`
+  );
+  if (!confirmed) return;
+
+  const button = $("#delete-all-leads");
+  button.disabled = true;
+  try {
+    const result = await api("/api/leads", { method: "DELETE" });
+    toast(
+      "All leads deleted",
+      `${result.deletedCount} lead${result.deletedCount === 1 ? "" : "s"} permanently removed.`
+    );
+    await loadState({ quiet: true });
+  } catch (error) {
+    toast("Could not delete leads", error.message, "error");
+    button.disabled = false;
+  }
+}
+
 async function handleQueryAction(queryId, action) {
   const query = appState.data.queries.find((item) => item.id === queryId);
   if (!query) return;
@@ -575,6 +602,7 @@ function bindEvents() {
   $("#lead-query-filter").addEventListener("change", renderLeads);
   $("#lead-intent-filter").addEventListener("change", renderLeads);
   $("#lead-status-filter").addEventListener("change", renderLeads);
+  $("#delete-all-leads").addEventListener("click", deleteAllLeads);
 
   document.addEventListener("click", (event) => {
     const leadButton = event.target.closest("[data-lead-action]");

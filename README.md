@@ -32,6 +32,7 @@ The first sweep runs immediately. Later sweeps run while the Node process is act
 - Independent intervals from 1 minute to 24 hours
 - Run now, pause, resume, and remove controls
 - New/saved/dismissed lead states and inbox filters
+- Confirmed bulk deletion for clearing all collected leads without removing searches
 - Buyer-intent scoring that separates direct requests from promotions, profiles, and incidental matches
 - Strict seller-ad vetoes, English/Indonesian request signals, short-post quality checks, and repost suppression
 - Threads `abbr[aria-label]` timestamp capture with a strict 24-hour lead window

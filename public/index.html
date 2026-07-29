@@ -1,0 +1,415 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#edf2f8" />
+    <meta name="description" content="Threadline — scheduled Threads lead discovery." />
+    <title>Threadline — lead radar</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Primary navigation">
+        <a class="brand" href="#overview" aria-label="Threadline home">
+          <span class="brand-mark" aria-hidden="true">
+            <span></span><span></span><span></span>
+          </span>
+          <span class="brand-word">threadline</span>
+          <span class="brand-version">β</span>
+        </a>
+
+        <nav class="nav-list">
+          <button class="nav-item is-active" data-view="overview">
+            <svg aria-hidden="true"><use href="#icon-radar"></use></svg>
+            <span>Radar</span>
+          </button>
+          <button class="nav-item" data-view="searches">
+            <svg aria-hidden="true"><use href="#icon-search"></use></svg>
+            <span>Searches</span>
+            <span class="nav-count" id="nav-query-count">0</span>
+          </button>
+          <button class="nav-item" data-view="leads">
+            <svg aria-hidden="true"><use href="#icon-users"></use></svg>
+            <span>Leads</span>
+            <span class="nav-count nav-count-accent" id="nav-lead-count">0</span>
+          </button>
+          <button class="nav-item" data-view="deliveries">
+            <svg aria-hidden="true"><use href="#icon-send"></use></svg>
+            <span>Deliveries</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-spacer"></div>
+
+        <div class="session-card" id="session-card">
+          <div class="session-label">
+            <span class="status-lamp" id="session-lamp"></span>
+            <span id="session-label">Threads not connected</span>
+          </div>
+          <p id="session-copy">Sign in once. Your browser session stays on this device.</p>
+          <button class="button button-ink button-small button-full" id="sidebar-login-button">
+            <svg aria-hidden="true"><use href="#icon-login"></use></svg>
+            <span>Connect Threads</span>
+          </button>
+        </div>
+
+        <div class="sidebar-foot">
+          <button class="icon-text-button" id="open-help">
+            <svg aria-hidden="true"><use href="#icon-help"></use></svg>
+            Setup guide
+          </button>
+          <span class="local-note">Runs locally · private by default</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <button class="mobile-brand" aria-label="Open navigation" id="mobile-menu-button">
+            <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
+          <div>
+            <p class="eyebrow" id="page-eyebrow">Live workspace</p>
+            <h1 id="page-title">Lead radar</h1>
+          </div>
+          <div class="topbar-actions">
+            <div class="run-indicator" id="run-indicator">
+              <span class="run-dot"></span>
+              <span id="run-indicator-copy">Queue clear</span>
+            </div>
+            <button class="button button-ghost desktop-only" id="refresh-button">
+              <svg aria-hidden="true"><use href="#icon-refresh"></use></svg>
+              Refresh
+            </button>
+            <button class="button button-primary" data-focus-search>
+              <svg aria-hidden="true"><use href="#icon-plus"></use></svg>
+              New search
+            </button>
+          </div>
+        </header>
+
+        <section class="view is-visible" id="view-overview" data-view-panel="overview">
+          <div class="command-card">
+            <div class="command-copy">
+              <div class="live-kicker"><span></span> Search command</div>
+              <h2>What kind of lead<br />should we listen for?</h2>
+              <p>Use the words your ideal customer would write in a Threads post.</p>
+            </div>
+
+            <form class="search-form" id="search-form">
+              <label class="field-label" for="query-input">Search phrase</label>
+              <div class="query-input-wrap">
+                <svg aria-hidden="true"><use href="#icon-search"></use></svg>
+                <input
+                  id="query-input"
+                  name="phrase"
+                  type="text"
+                  minlength="3"
+                  maxlength="180"
+                  autocomplete="off"
+                  placeholder="e.g. finding a web developer"
+                  required
+                />
+                <span class="keyboard-hint">⌘ K</span>
+              </div>
+              <div class="form-options">
+                <label class="compact-field">
+                  <span>Run every</span>
+                  <span class="select-wrap">
+                    <select id="interval-input" name="intervalMinutes">
+                      <option value="5">5 minutes</option>
+                      <option value="10">10 minutes</option>
+                      <option value="15" selected>15 minutes</option>
+                      <option value="30">30 minutes</option>
+                      <option value="60">1 hour</option>
+                      <option value="180">3 hours</option>
+                      <option value="360">6 hours</option>
+                      <option value="1440">Daily</option>
+                    </select>
+                    <svg aria-hidden="true"><use href="#icon-chevron"></use></svg>
+                  </span>
+                </label>
+                <label class="compact-field">
+                  <span>Collect up to</span>
+                  <span class="select-wrap">
+                    <select id="max-results-input" name="maxResults">
+                      <option value="15">15 posts</option>
+                      <option value="30" selected>30 posts</option>
+                      <option value="50">50 posts</option>
+                      <option value="75">75 posts</option>
+                      <option value="100">100 posts</option>
+                    </select>
+                    <svg aria-hidden="true"><use href="#icon-chevron"></use></svg>
+                  </span>
+                </label>
+                <button class="button button-primary button-launch" type="submit">
+                  <span>Start listening</span>
+                  <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
+                </button>
+              </div>
+            </form>
+
+            <div class="signal-orbit" aria-hidden="true">
+              <span class="orbit orbit-one"></span>
+              <span class="orbit orbit-two"></span>
+              <span class="orbit orbit-three"></span>
+              <span class="orbit-core"></span>
+            </div>
+          </div>
+
+          <div class="cadence-strip" aria-label="Scraping cadence">
+            <div class="cadence-intro">
+              <p class="data-label">Next sweep</p>
+              <strong id="next-run-countdown">No search yet</strong>
+            </div>
+            <div class="cadence-track" id="cadence-track">
+              <span class="cadence-line"></span>
+              <div class="cadence-stop is-past"><i></i><span>Queued</span></div>
+              <div class="cadence-stop is-active"><i></i><span>Threads</span></div>
+              <div class="cadence-stop"><i></i><span>Match</span></div>
+              <div class="cadence-stop"><i></i><span>Deliver</span></div>
+            </div>
+            <button class="icon-button" id="run-next-button" title="Run the next active search now" aria-label="Run next search now">
+              <svg aria-hidden="true"><use href="#icon-play"></use></svg>
+            </button>
+          </div>
+
+          <div class="dashboard-grid">
+            <section class="panel leads-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Incoming signal</p>
+                  <h2>Fresh leads</h2>
+                </div>
+                <div class="panel-actions">
+                  <div class="segmented" role="group" aria-label="Lead intent">
+                    <button class="is-active" data-intent-filter="buyer">Buyer intent</button>
+                    <button data-intent-filter="general">General</button>
+                    <button data-intent-filter="all">All</button>
+                  </div>
+                  <button class="text-button" data-view-link="leads">View all <span>→</span></button>
+                </div>
+              </div>
+              <div class="lead-list" id="overview-lead-list"></div>
+            </section>
+
+            <aside class="panel activity-panel">
+              <div class="panel-head">
+                <div>
+                  <p class="eyebrow">Run log</p>
+                  <h2>Activity</h2>
+                </div>
+                <span class="live-badge"><i></i> Live</span>
+              </div>
+              <div class="activity-list" id="activity-list"></div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="view" id="view-searches" data-view-panel="searches">
+          <div class="section-intro">
+            <div>
+              <p class="section-note">Each search runs immediately, then keeps its own schedule.</p>
+            </div>
+            <button class="button button-primary" data-focus-search>
+              <svg aria-hidden="true"><use href="#icon-plus"></use></svg>
+              Add search
+            </button>
+          </div>
+          <div class="search-grid" id="search-grid"></div>
+        </section>
+
+        <section class="view" id="view-leads" data-view-panel="leads">
+          <div class="lead-toolbar">
+            <div class="search-mini">
+              <svg aria-hidden="true"><use href="#icon-search"></use></svg>
+              <input type="search" id="lead-search-input" placeholder="Search people or post text" />
+            </div>
+            <select id="lead-query-filter" aria-label="Filter by search">
+              <option value="all">All searches</option>
+            </select>
+            <select id="lead-intent-filter" aria-label="Filter by intent">
+              <option value="all">Any intent</option>
+              <option value="buyer">Buyer intent</option>
+              <option value="general">General</option>
+            </select>
+            <select id="lead-status-filter" aria-label="Filter by status">
+              <option value="all">Any status</option>
+              <option value="new">New</option>
+              <option value="saved">Saved</option>
+              <option value="dismissed">Dismissed</option>
+            </select>
+            <div class="toolbar-count" id="lead-toolbar-count">0 leads</div>
+          </div>
+          <div class="all-leads-list" id="all-leads-list"></div>
+        </section>
+
+        <section class="view" id="view-deliveries" data-view-panel="deliveries">
+          <div class="delivery-layout">
+            <section class="delivery-main">
+              <div class="delivery-hero">
+                <div>
+                  <p class="eyebrow">Quiet until useful</p>
+                  <h2>Send good leads<br />where work happens.</h2>
+                  <p>Threadline sends a focused card only when a new buyer-intent lead is found. General matches stay in the dashboard.</p>
+                </div>
+                <div class="delivery-rings" aria-hidden="true">
+                  <span></span><span></span><i></i>
+                </div>
+              </div>
+
+              <form id="notification-form">
+                <article class="channel-card">
+                  <div class="channel-icon slack-icon" aria-hidden="true">
+                    <span></span><span></span><span></span><span></span>
+                  </div>
+                  <div class="channel-body">
+                    <div class="channel-title">
+                      <div><h3>Slack</h3><p>Send clean buyer-lead cards using Block Kit.</p></div>
+                      <label class="switch"><input type="checkbox" id="slack-enabled" /><span></span><b>Enable Slack</b></label>
+                    </div>
+                    <div class="webhook-row">
+                      <label>
+                        <span>Webhook URL</span>
+                        <input type="password" id="slack-url" autocomplete="off" placeholder="https://hooks.slack.com/services/…" />
+                      </label>
+                      <button class="button button-ghost" type="button" data-test-channel="slack">Send test</button>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="channel-card">
+                  <div class="channel-icon discord-icon" aria-hidden="true">
+                    <svg><use href="#icon-discord"></use></svg>
+                  </div>
+                  <div class="channel-body">
+                    <div class="channel-title">
+                      <div><h3>Discord</h3><p>Send buyer leads as structured Discord embeds.</p></div>
+                      <label class="switch"><input type="checkbox" id="discord-enabled" /><span></span><b>Enable Discord</b></label>
+                    </div>
+                    <div class="webhook-row">
+                      <label>
+                        <span>Webhook URL</span>
+                        <input type="password" id="discord-url" autocomplete="off" placeholder="https://discord.com/api/webhooks/…" />
+                      </label>
+                      <button class="button button-ghost" type="button" data-test-channel="discord">Send test</button>
+                    </div>
+                  </div>
+                </article>
+
+                <div class="event-card">
+                  <span class="buyer-only-mark" aria-hidden="true">
+                    <svg><use href="#icon-radar"></use></svg>
+                  </span>
+                  <div class="buyer-only-copy">
+                    <h3>Buyer-only delivery is on</h3>
+                    <p>General matches, empty sweeps, completed runs, and scraper errors stay out of Slack and Discord.</p>
+                  </div>
+                  <span class="locked-rule"><svg><use href="#icon-lock"></use></svg> Always on</span>
+                </div>
+
+                <div class="save-bar">
+                  <span><svg><use href="#icon-lock"></use></svg> Webhooks are stored only in <code>data/threadline.json</code></span>
+                  <button class="button button-primary" type="submit">Save delivery settings</button>
+                </div>
+              </form>
+            </section>
+
+            <aside class="delivery-preview">
+              <p class="data-label">Message preview</p>
+              <div class="message-preview">
+                <div class="preview-brand"><span class="brand-mark mini"><span></span><span></span><span></span></span></div>
+                <div>
+                  <strong>Threadline <i>APP</i></strong>
+                  <p class="preview-time">Today at 10:45 AM</p>
+                  <h4>🎯 1 new buyer-intent lead</h4>
+                  <p><b>Search:</b> looking for a web developer</p>
+                  <div class="preview-lead">
+                    <strong>@sample.founder <i>Buyer 96/100</i></strong>
+                    <p>Looking for a web developer to rebuild our company website. Paid project, starting next week.</p>
+                    <span>Open original Threads post →</span>
+                  </div>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <div class="modal-backdrop" id="auth-modal" hidden>
+      <section class="modal" role="dialog" aria-modal="true" aria-labelledby="auth-modal-title">
+        <button class="modal-close" data-close-modal aria-label="Close"><svg><use href="#icon-close"></use></svg></button>
+        <div class="modal-visual">
+          <div class="login-path" aria-hidden="true">
+            <span class="path-node path-one"></span><span class="path-line"></span><span class="path-node path-two"></span>
+          </div>
+          <span class="modal-step">One-time setup</span>
+        </div>
+        <div class="modal-content">
+          <p class="eyebrow">Connect source</p>
+          <h2 id="auth-modal-title">Sign in to Threads</h2>
+          <p>A browser window will open. Sign in there so Threadline can use the same local session for scheduled searches.</p>
+          <div class="privacy-note">
+            <svg aria-hidden="true"><use href="#icon-lock"></use></svg>
+            <span>Your password never enters Threadline. The browser keeps the session on this computer.</span>
+          </div>
+          <ol class="login-steps">
+            <li><span>1</span>Open the Threads sign-in window</li>
+            <li><span>2</span>Finish login or two-factor verification</li>
+            <li><span>3</span>Return here and check the connection</li>
+          </ol>
+          <div class="modal-actions">
+            <button class="button button-primary button-full" id="open-login-window">
+              <svg aria-hidden="true"><use href="#icon-external"></use></svg>
+              Open Threads login
+            </button>
+            <button class="button button-ghost button-full" id="check-login-button">I’m signed in — check connection</button>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <div class="modal-backdrop" id="help-modal" hidden>
+      <section class="modal help-modal" role="dialog" aria-modal="true" aria-labelledby="help-modal-title">
+        <button class="modal-close" data-close-modal aria-label="Close"><svg><use href="#icon-close"></use></svg></button>
+        <div class="modal-content">
+          <p class="eyebrow">Setup guide</p>
+          <h2 id="help-modal-title">From phrase to lead</h2>
+          <ol class="guide-list">
+            <li><span>01</span><div><strong>Connect Threads</strong><p>Use the browser window once. Keep the app running for scheduled sweeps.</p></div></li>
+            <li><span>02</span><div><strong>Add a buying-signal phrase</strong><p>Try natural language such as “looking for a web developer” or “need help with Shopify”.</p></div></li>
+            <li><span>03</span><div><strong>Review and deliver</strong><p>Save useful posts, open the original thread, and send new matches to Slack or Discord.</p></div></li>
+          </ol>
+        </div>
+      </section>
+    </div>
+
+    <div class="toast-region" id="toast-region" aria-live="polite"></div>
+
+    <svg class="svg-sprite" aria-hidden="true">
+      <symbol id="icon-radar" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3"/><path d="M12 4v8l5 3"/></symbol>
+      <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 4.2 4.2"/></symbol>
+      <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 20v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 20v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+      <symbol id="icon-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></symbol>
+      <symbol id="icon-login" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="m10 17 5-5-5-5M15 12H3"/></symbol>
+      <symbol id="icon-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.7 9a2.5 2.5 0 0 1 4.8 1c0 1.7-2.5 2-2.5 4M12 18h.01"/></symbol>
+      <symbol id="icon-refresh" viewBox="0 0 24 24"><path d="M20 6v5h-5"/><path d="M18 15a7 7 0 1 1-.8-7.8L20 10"/></symbol>
+      <symbol id="icon-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+      <symbol id="icon-chevron" viewBox="0 0 24 24"><path d="m7 9.5 5 5 5-5"/></symbol>
+      <symbol id="icon-arrow" viewBox="0 0 24 24"><path d="M5 12h14M14 7l5 5-5 5"/></symbol>
+      <symbol id="icon-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7Z"/></symbol>
+      <symbol id="icon-discord" viewBox="0 0 24 24"><path d="M8.2 6.2A13 13 0 0 1 12 5.6c1.3 0 2.6.2 3.8.6M8 17.5c2.7 2 5.3 2 8 0"/><path d="M6 7.5c-2 3-2.5 6-2 9 2.7 2 5.3 2.8 8 2.8s5.3-.8 8-2.8c.5-3-.1-6-2-9l-2.5-1.2-1 2.2a9 9 0 0 0-5 0l-1-2.2Z"/><circle cx="8.7" cy="13" r="1"/><circle cx="15.3" cy="13" r="1"/></symbol>
+      <symbol id="icon-lock" viewBox="0 0 24 24"><rect x="5" y="10" width="14" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+      <symbol id="icon-close" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></symbol>
+      <symbol id="icon-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
+      <symbol id="icon-bookmark" viewBox="0 0 24 24"><path d="M6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18l-6-4-6 4Z"/></symbol>
+      <symbol id="icon-x" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></symbol>
+      <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+      <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14"/></symbol>
+      <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+      <symbol id="icon-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l2-2a5 5 0 0 0-7-7l-1.2 1.2"/><path d="M14 11a5 5 0 0 0-7.5-.5l-2 2a5 5 0 0 0 7 7l1.2-1.2"/></symbol>
+    </svg>
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

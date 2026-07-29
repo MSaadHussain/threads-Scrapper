@@ -1,0 +1,17 @@
+{
+  "name": "threadline-lead-scraper",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Scheduled Threads lead discovery dashboard with Slack and Discord delivery.",
+  "scripts": {
+    "dev": "node --watch server.js",
+    "start": "node server.js",
+    "check": "node --check server.js && node --check public/app.js && node --check intent.js && node --check webhook-format.js && node --check lead-dedupe.js && node --check thread-time.js && node scripts/intent-check.mjs && node scripts/dedupe-check.mjs && node scripts/thread-time-check.mjs && node scripts/webhook-check.mjs",
+    "visual-check": "node scripts/visual-check.mjs"
+  },
+  "dependencies": {
+    "express": "^5.1.0",
+    "playwright": "^1.54.1"
+  }
+}

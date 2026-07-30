@@ -34,8 +34,11 @@ The first sweep runs immediately. Later sweeps run while the Node process is act
 - New/saved/dismissed lead states and inbox filters
 - Confirmed bulk deletion for clearing all collected leads without removing searches
 - Buyer-intent scoring that separates direct requests from promotions, profiles, and incidental matches
+- Manual General-to-Buyer qualification with immediate one-time Slack/Discord delivery
 - Strict seller-ad vetoes, English/Indonesian request signals, short-post quality checks, and repost suppression
-- Threads `abbr[aria-label]` timestamp capture with a strict 24-hour lead window
+- Threads `abbr[aria-label]` timestamp capture with a strict 24-hour default lead window
+- Per-search post-age windows: 24 hours, 3 days, 7 days, 14 days, or 30 days
+- Optional United States post filter using `US`, `U.S.`, `USA`, `United States`, or a valid `+1` phone number
 - Buyer-only Slack Block Kit and Discord embed delivery with URL validation
 - Delivery tests and notification event preferences
 - Persistent searches, leads, activity, webhook settings, and run statistics

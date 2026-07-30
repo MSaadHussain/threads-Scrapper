@@ -122,7 +122,11 @@ function leadMarkup(lead) {
   const profileUrl = safeUrl(lead.profileUrl);
   const statusLabel = lead.status === "saved" ? "Saved" : lead.status === "dismissed" ? "Passed" : "New";
   const intent = lead.intent || "general";
-  const intentLabel = intent === "buyer" ? `Buyer intent · ${lead.intentScore || 0}` : "General";
+  const intentLabel = intent === "buyer"
+    ? lead.intentSource === "manual"
+      ? "Buyer intent · Manual"
+      : `Buyer intent · ${lead.intentScore || 0}`
+    : "General";
   const leadTime = lead.timeText || relativeTime(lead.postedAt || lead.discoveredAt);
   return `
     <article class="lead-row" data-lead-id="${escapeHtml(lead.id)}">
@@ -131,6 +135,12 @@ function leadMarkup(lead) {
         <div class="lead-person">
           <a href="${profileUrl}" target="_blank" rel="noreferrer">@${escapeHtml(lead.username)}</a>
           <span class="intent-state ${escapeHtml(intent)}" title="${escapeHtml(lead.intentReason || "No direct buyer language")}">${escapeHtml(intentLabel)}</span>
+          ${intent !== "buyer" ? `
+            <button class="manual-qualify" type="button" data-lead-qualify title="Mark as buyer and send a notification">
+              <svg aria-hidden="true"><use href="#icon-check"></use></svg>
+              <span>Mark buyer + notify</span>
+            </button>
+          ` : ""}
           <span class="lead-state ${escapeHtml(lead.status)}">${statusLabel}</span>
           <time class="lead-time" datetime="${escapeHtml(lead.postedAt || lead.discoveredAt || "")}" title="${escapeHtml(lead.timeLabel || leadTime)}">${escapeHtml(leadTime)}</time>
         </div>
@@ -223,6 +233,19 @@ function intervalOptions(selected) {
   ).join("");
 }
 
+function ageOptions(selected) {
+  const values = [
+    [24, "24 hours"],
+    [72, "3 days"],
+    [168, "7 days"],
+    [336, "14 days"],
+    [720, "30 days"]
+  ];
+  return values.map(([value, label]) =>
+    `<option value="${value}" ${Number(selected || 24) === value ? "selected" : ""}>${label}</option>`
+  ).join("");
+}
+
 function queryMarkup(query) {
   const isPaused = query.status === "paused";
   const isRunning = query.status === "running";
@@ -232,12 +255,26 @@ function queryMarkup(query) {
         <div>
           <p class="eyebrow">Search phrase</p>
           <h3>“${escapeHtml(query.phrase)}”</h3>
+          <div class="search-filter-row">
+            <label class="search-filter search-age ${Number(query.maxAgeHours || 24) > 24 ? "is-extended" : ""}">
+              <select data-query-age aria-label="Change maximum post age">
+                ${ageOptions(query.maxAgeHours)}
+              </select>
+            </label>
+            <label class="search-filter search-location ${query.locationFilter === "united_states" ? "is-filtered" : ""}">
+              <select data-query-location aria-label="Change search location">
+                <option value="any" ${query.locationFilter !== "united_states" ? "selected" : ""}>Any location</option>
+                <option value="united_states" ${query.locationFilter === "united_states" ? "selected" : ""}>United States only</option>
+              </select>
+            </label>
+          </div>
         </div>
         <span class="search-status ${escapeHtml(query.status)}">${escapeHtml(statusCopy(query.status))}</span>
       </div>
       <div class="search-stats">
         <div class="search-stat"><span>Cadence</span><select class="interval-select" data-query-interval aria-label="Change cadence">${intervalOptions(query.intervalMinutes)}</select></div>
         <div class="search-stat"><span>Last run</span><strong>${relativeTime(query.lastRunAt)}</strong></div>
+        <div class="search-stat"><span>Collected</span><strong>${query.lastScrapedCount || 0}/${query.maxResults}</strong></div>
         <div class="search-stat"><span>Buyer leads</span><strong>${query.lastQualifiedCount || 0}</strong></div>
       </div>
       ${query.lastError ? `<p class="search-error">${escapeHtml(query.lastError)}</p>` : ""}
@@ -390,9 +427,11 @@ async function handleSearchSubmit(event) {
     const phrase = $("#query-input").value.trim();
     const intervalMinutes = Number($("#interval-input").value);
     const maxResults = Number($("#max-results-input").value);
+    const locationFilter = $("#location-input").value;
+    const maxAgeHours = Number($("#age-input").value);
     await api("/api/queries", {
       method: "POST",
-      body: JSON.stringify({ phrase, intervalMinutes, maxResults })
+      body: JSON.stringify({ phrase, intervalMinutes, maxResults, locationFilter, maxAgeHours })
     });
     $("#query-input").value = "";
     toast("Search is listening", `“${phrase}” was added to the queue.`);
@@ -455,6 +494,30 @@ async function updateLead(leadId, status) {
     toast(nextStatus === "saved" ? "Lead saved" : nextStatus === "dismissed" ? "Lead dismissed" : "Lead returned to inbox");
   } catch (error) {
     toast("Could not update lead", error.message, "error");
+  }
+}
+
+async function qualifyLead(leadId, button) {
+  const lead = appState.data.leads.find((item) => item.id === leadId);
+  if (!lead || lead.intent === "buyer") return;
+  button.disabled = true;
+  button.querySelector("span").textContent = "Qualifying…";
+  try {
+    const result = await api(`/api/leads/${encodeURIComponent(leadId)}/qualify`, {
+      method: "POST",
+      body: "{}"
+    });
+    const deliveryCopy = result.notified.length
+      ? `Notification sent to ${result.notified.join(" and ")}.`
+      : result.failed.length
+        ? "Buyer status saved, but notification delivery failed."
+        : "Buyer status saved. Enable Slack or Discord to send notifications.";
+    toast("Marked as buyer", deliveryCopy, result.failed.length ? "error" : "success");
+    await loadState({ quiet: true });
+  } catch (error) {
+    button.disabled = false;
+    button.querySelector("span").textContent = "Mark buyer + notify";
+    toast("Could not mark as buyer", error.message, "error");
   }
 }
 
@@ -523,6 +586,46 @@ async function updateQueryInterval(queryId, intervalMinutes) {
     await loadState({ quiet: true });
   } catch (error) {
     toast("Could not change cadence", error.message, "error");
+    renderQueries();
+  }
+}
+
+async function updateQueryLocation(queryId, locationFilter) {
+  const query = appState.data.queries.find((item) => item.id === queryId);
+  if (!query) return;
+  try {
+    await api(`/api/queries/${encodeURIComponent(queryId)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ locationFilter })
+    });
+    query.locationFilter = locationFilter;
+    toast(
+      "Location filter updated",
+      locationFilter === "united_states"
+        ? `“${query.phrase}” now requires United States signals.`
+        : `“${query.phrase}” now accepts any location.`
+    );
+    await loadState({ quiet: true });
+  } catch (error) {
+    toast("Could not change location", error.message, "error");
+    renderQueries();
+  }
+}
+
+async function updateQueryAge(queryId, maxAgeHours) {
+  const query = appState.data.queries.find((item) => item.id === queryId);
+  if (!query) return;
+  try {
+    await api(`/api/queries/${encodeURIComponent(queryId)}`, {
+      method: "PATCH",
+      body: JSON.stringify({ maxAgeHours })
+    });
+    query.maxAgeHours = maxAgeHours;
+    const ageLabel = maxAgeHours === 24 ? "24 hours" : `${maxAgeHours / 24} days`;
+    toast("Post age updated", `“${query.phrase}” now checks the last ${ageLabel}.`);
+    await loadState({ quiet: true });
+  } catch (error) {
+    toast("Could not change post age", error.message, "error");
     renderQueries();
   }
 }
@@ -605,6 +708,12 @@ function bindEvents() {
   $("#delete-all-leads").addEventListener("click", deleteAllLeads);
 
   document.addEventListener("click", (event) => {
+    const qualifyButton = event.target.closest("[data-lead-qualify]");
+    if (qualifyButton) {
+      const row = qualifyButton.closest("[data-lead-id]");
+      qualifyLead(row.dataset.leadId, qualifyButton);
+      return;
+    }
     const leadButton = event.target.closest("[data-lead-action]");
     if (leadButton) {
       const row = leadButton.closest("[data-lead-id]");
@@ -618,6 +727,18 @@ function bindEvents() {
     }
   });
   document.addEventListener("change", (event) => {
+    const ageSelect = event.target.closest("[data-query-age]");
+    if (ageSelect) {
+      const card = ageSelect.closest("[data-query-id]");
+      updateQueryAge(card.dataset.queryId, Number(ageSelect.value));
+      return;
+    }
+    const locationSelect = event.target.closest("[data-query-location]");
+    if (locationSelect) {
+      const card = locationSelect.closest("[data-query-id]");
+      updateQueryLocation(card.dataset.queryId, locationSelect.value);
+      return;
+    }
     const intervalSelect = event.target.closest("[data-query-interval]");
     if (!intervalSelect) return;
     const card = intervalSelect.closest("[data-query-id]");

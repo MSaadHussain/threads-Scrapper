@@ -142,6 +142,29 @@
                     <svg aria-hidden="true"><use href="#icon-chevron"></use></svg>
                   </span>
                 </label>
+                <label class="compact-field age-field">
+                  <span>Post age</span>
+                  <span class="select-wrap">
+                    <select id="age-input" name="maxAgeHours">
+                      <option value="24" selected>Last 24 hours</option>
+                      <option value="72">Last 3 days</option>
+                      <option value="168">Last 7 days</option>
+                      <option value="336">Last 14 days</option>
+                      <option value="720">Last 30 days</option>
+                    </select>
+                    <svg aria-hidden="true"><use href="#icon-chevron"></use></svg>
+                  </span>
+                </label>
+                <label class="compact-field location-field">
+                  <span>Location</span>
+                  <span class="select-wrap">
+                    <select id="location-input" name="locationFilter">
+                      <option value="any" selected>Any location</option>
+                      <option value="united_states">United States</option>
+                    </select>
+                    <svg aria-hidden="true"><use href="#icon-chevron"></use></svg>
+                  </span>
+                </label>
                 <button class="button button-primary button-launch" type="submit">
                   <span>Start listening</span>
                   <svg aria-hidden="true"><use href="#icon-arrow"></use></svg>
@@ -409,6 +432,7 @@
       <symbol id="icon-external" viewBox="0 0 24 24"><path d="M14 4h6v6M20 4l-9 9"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/></symbol>
       <symbol id="icon-bookmark" viewBox="0 0 24 24"><path d="M6 4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18l-6-4-6 4Z"/></symbol>
       <symbol id="icon-x" viewBox="0 0 24 24"><path d="m7 7 10 10M17 7 7 17"/></symbol>
+      <symbol id="icon-check" viewBox="0 0 24 24"><path d="m5 12 4 4L19 6"/></symbol>
       <symbol id="icon-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
       <symbol id="icon-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14"/></symbol>
       <symbol id="icon-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>

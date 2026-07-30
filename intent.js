@@ -65,6 +65,12 @@ export function classifyLead(text, query = "") {
     if (/\bwho can\b.{0,80}\b(?:build|create|design|develop|manage|run|fix|help)\b/.test(copy)) {
       addPositive(48, "Asking who can deliver the work");
     }
+    if (
+      /\b(?:is|are) there\s+(?:any|an?|some)\b.{0,60}\b(?:developer|designer|specialist|expert|freelancer|agency|marketer|manager)\b/.test(copy) ||
+      /\blooking for\b.{0,100}\b(?:developer|designer|specialist|expert|freelancer|agency|marketer|manager)\b.{0,100}\b(?:my|our)\s+(?:business|website|site|store|app|project|company)\b/.test(copy)
+    ) {
+      addPositive(52, "Asking for an available specialist");
+    }
     if (/@[\w.]+\b.{0,35}\byou (?:were|where|are)\b.{0,55}\b(?:looking|finding|searching|seeking|needing)\b/.test(copy)) {
       addPositive(55, "Referral to someone actively looking");
     }
@@ -78,6 +84,16 @@ export function classifyLead(text, query = "") {
 
   if (/\bif you(?:'re| are) looking\b/.test(copy)) {
     addNegative(48, "Service promotion", true);
+  }
+  if (
+    /\b(?:securing|finding|find|landing|land|get(?:ting)?)\s+(?:a\s+)?(?:new\s+)?job\b/.test(copy) ||
+    /\b(?:i(?:'m| am)?|currently)\s+(?:(?:actively|urgently)\s+)?(?:looking|searching|seeking)\s+for\s+(?:(?:an?|new|my next)\s+)?(?:[\w+.#-]+\s+){0,5}(?:jobs?|roles?|positions?|employment|work|opportunit(?:y|ies))\b/.test(copy) ||
+    /\bi\s+(?:really\s+|urgently\s+|currently\s+)?need\s+(?:a\s+)?job\b/.test(copy) ||
+    /\b(?:if anyone|does anyone)\s+(?:has|have|know(?:s)? of)\s+(?:any\s+)?(?:open\s+)?(?:jobs?|roles?|positions?|vacanc(?:y|ies)|opportunit(?:y|ies))\b/.test(copy) ||
+    /\b(?:open to work|job seeker|job hunting|seeking employment|currently unemployed)\b/.test(copy) ||
+    /\b(?:connect|refer)\s+me\b.{0,45}\b(?:jobs?|roles?|positions?|openings?|opportunit(?:y|ies))\b/.test(copy)
+  ) {
+    addNegative(100, "Job seeker looking for employment", true);
   }
   if (/\b(?:we|i|our team)\b.{0,30}\b(?:build|offer|provide|deliver|develop|speciali[sz]e|focus on|help businesses|help clients)\b/.test(copy)) {
     addNegative(52, "Service provider language", true);

@@ -36,7 +36,8 @@ export function slackPayload(message) {
         type: "section",
         fields: [
           { type: "mrkdwn", text: `*Search*\n${escapeSlack(message.query)}` },
-          { type: "mrkdwn", text: `*Qualified*\n${count} new` }
+          { type: "mrkdwn", text: `*Qualified*\n${count} new` },
+          ...(message.locationLabel ? [{ type: "mrkdwn", text: `*Location*\n${escapeSlack(message.locationLabel)}` }] : [])
         ]
       },
       { type: "divider" }
@@ -102,6 +103,7 @@ export function discordPayload(message) {
         color: 16741975,
         fields: [
           { name: "Search", value: truncate(message.query, 80), inline: true },
+          ...(message.locationLabel ? [{ name: "Location", value: message.locationLabel, inline: true }] : []),
           { name: "Buyer intent", value: `${lead.intentScore || 0}/100`, inline: true },
           { name: "Posted", value: lead.timeText || "Recently", inline: true },
           { name: "Why it matched", value: truncate(lead.intentReason, 100), inline: false }
